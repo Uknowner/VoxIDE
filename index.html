@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Browser IDE</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.0/min/vs/loader.js" defer></script>
+    <script src="script.js" defer></script>
+</head>
+<body>
+
+<!-- Drop Zone Overlay -->
+<div id="dropZone" class="drop-zone">
+  <div class="drop-zone-icon">📂</div>
+  <div class="drop-zone-title">Drop your project folder here</div>
+  <div class="drop-zone-sub">or click to browse</div>
+</div>
+
+<input id="folderInput" type="file" webkitdirectory multiple hidden />
+
+<!-- Right-click Context Menu -->
+<div id="contextMenu" class="context-menu hidden">
+  <div class="ctx-item" id="ctxOpen">Open File</div>
+  <div class="ctx-divider"></div>
+  <div class="ctx-item" id="ctxNewFileHere">New File Here</div>
+  <div class="ctx-item" id="ctxNewFolderHere">New Folder Here</div>
+  <div class="ctx-divider"></div>
+  <div class="ctx-item" id="ctxRename">Rename</div>
+  <div class="ctx-item ctx-danger" id="ctxDelete">Delete</div>
+</div>
+
+<div class="app">
+
+  <!-- ===========================
+       SIDEBAR
+  ============================ -->
+  <aside class="sidebar">
+    <div class="search-wrap">
+      <input id="fileSearch" type="search" placeholder="🔍 Search files..." />
+    </div>
+    <div class="project-info">
+      <div id="projectName">No project opened</div>
+      <div id="projectPath">Drop a folder or click Open</div>
+    </div>
+    <div id="fileTree" class="file-tree"></div>
+  </aside>
+
+  <!-- ===========================
+       MAIN
+  ============================ -->
+  <main class="main">
+
+    <!-- TOOLBAR -->
+    <header class="toolbar">
+      <div class="toolbar-left">
+        <button id="openProjectBtn" title="Open folder">Open</button>
+        <button id="saveFileBtn" title="Save current file (Ctrl+S)">Save</button>
+        <button id="saveAllBtn" title="Save all open files">Save All</button>
+        <div class="toolbar-sep"></div>
+        <button id="newFileBtn" title="New file">＋ File</button>
+        <button id="newFolderBtn" title="New folder">＋ Folder</button>
+        <button id="renameItemBtn" title="Rename selected">Rename</button>
+        <button id="deleteItemBtn" title="Delete selected" class="btn-danger">Delete</button>
+        <div class="toolbar-sep"></div>
+        <button id="exportProjectBtn" title="Export project as ZIP">Export</button>
+      </div>
+
+      <div class="toolbar-center">
+        <span id="currentFile">No file open</span>
+      </div>
+
+      <div class="toolbar-right">
+        <button id="autoSaveBtn" title="Toggle auto-save" class="btn-toggle">Auto Save</button>
+        <button id="wordWrapBtn" title="Toggle word wrap" class="btn-toggle btn-on">Wrap</button>
+        <button id="fontDecBtn" title="Decrease font size">A−</button>
+        <button id="fontIncBtn" title="Increase font size">A＋</button>
+        <button id="toggleTreeBtn" title="Toggle sidebar">⇔ Tree</button>
+      </div>
+    </header>
+
+    <!-- SAVE ACCESS BANNER -->
+    <div id="saveAccessBanner" class="save-access-banner hidden">
+      <span class="banner-icon">⚠️</span>
+      <span class="banner-msg">Read-only mode — drag &amp; drop can't save back to disk. Grant folder access to enable saving.</span>
+      <button id="grantAccessBtn" class="btn-grant">Grant Access</button>
+      <button id="dismissBannerBtn" class="btn-dismiss">✕</button>
+    </div>
+
+    <!-- TABS -->
+    <section id="tabsBar" class="tabs-bar" aria-label="Editor Tabs"></section>
+
+    <!-- EDITOR -->
+    <section class="editor-area">
+      <div id="editor" class="editor-pane"></div>
+    </section>
+
+    <!-- STATUS BAR -->
+    <footer class="status-bar">
+      <span id="statusText">Ready</span>
+      <div class="status-right">
+        <span id="langText">Plain Text</span>
+        <span id="cursorText">Ln 1, Col 1</span>
+        <span id="encodingText">UTF-8</span>
+      </div>
+    </footer>
+
+  </main>
+</div>
+</body>
+</html>
