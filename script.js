@@ -47,6 +47,7 @@ const state = {
   editor:              null,
   currentModel:        null,
   treeVisible:         true,
+  expandedFolders:     new Set([""]), // "" = project root; only root starts expanded
   wordWrap:            true,
   fontSize:            14,
   autoSave:            false,
@@ -622,10 +623,22 @@ function createFolderNode(folderName, folderPath) {
   const children = document.createElement("div");
   children.className = "folder-children";
 
+  const isExpanded = state.expandedFolders.has(folderPath);
+  children.classList.toggle("hidden", !isExpanded);
+  title.classList.toggle("folder-open", isExpanded);
+
   title.addEventListener("click", (e) => {
     e.stopPropagation();
     selectTreeItem(folderPath, "directory", title);
-    children.classList.toggle("hidden");
+
+    const nowHidden = children.classList.toggle("hidden");
+    title.classList.toggle("folder-open", !nowHidden);
+
+    if (nowHidden) {
+      state.expandedFolders.delete(folderPath);
+    } else {
+      state.expandedFolders.add(folderPath);
+    }
   });
 
   title.addEventListener("contextmenu", (e) => {
@@ -1234,8 +1247,13 @@ function toggleTree() {
 function applySearchFilter() {
   const query = state.searchQuery;
   if (!query) {
-    els.fileTree.querySelectorAll(".folder, .file")
-      .forEach((n) => (n.style.display = ""));
+    // Restore normal expand/collapse state (as tracked in state.expandedFolders)
+    els.fileTree.querySelectorAll(".folder, .file").forEach((n) => (n.style.display = ""));
+    els.fileTree.querySelectorAll(".folder").forEach((folder) => {
+      const path     = folder.dataset.path;
+      const children = folder.querySelector(".folder-children");
+      children?.classList.toggle("hidden", !state.expandedFolders.has(path));
+    });
     return;
   }
 
@@ -1259,7 +1277,9 @@ function applySearchFilter() {
 
     const visible = match || childMatch;
     folder.style.display = visible ? "" : "none";
-    if (children) children.style.display = visible ? "" : "none";
+    // While searching, force-expand any folder that contains a match,
+    // regardless of its collapsed state, so results are actually visible.
+    if (children) children.classList.toggle("hidden", !childMatch);
   }
 
   for (const file of Array.from(els.fileTree.children).filter(
@@ -1290,7 +1310,7 @@ function filterFolderRecursively(folderEl, query) {
   }
 
   const visible = match || childMatch;
-  if (children) children.style.display = visible ? "" : "none";
+  if (children) children.classList.toggle("hidden", !childMatch);
   return visible;
 }
 
